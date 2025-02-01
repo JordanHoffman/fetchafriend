@@ -3,6 +3,16 @@ import useSWRImmutable from "swr/immutable"
 import useSWRMutation from "swr/mutation"
 
 type FetchReponse<T> = { success: boolean, status: number, message?: string, result: T }
+type FetchError = FetchReponse<null>
+
+export type Dog = {
+	id: string
+	img: string
+	name: string
+	age: number
+	zip_code: string
+	breed: string
+}
 
 const prepareResponseError = async (r: Response) => {
 	const contentType = r.headers.get("content-type");
@@ -12,7 +22,7 @@ const prepareResponseError = async (r: Response) => {
 		const details = await r.text()
 		message += ` ${details}`
 	}
-	const fetchError: FetchReponse<null> = {
+	const fetchError: FetchError = {
 		success: false,
 		status: r.status,
 		message: message,
@@ -46,7 +56,7 @@ const fetcher = (url: string | URL | Request ) => fetch(url, {
 })
 
 
-async function poster<T extends { [key: string]: unknown }> (
+async function poster<T> (
 	url: string | URL | Request, 
 	{ arg }: { arg: T}
 ) 
@@ -82,7 +92,8 @@ const ROUTE = {
 	},
 	POST: {
 		LOGIN: makeRoute('/auth/login'),
-		LOGOUT: makeRoute('/auth/logout')
+		LOGOUT: makeRoute('/auth/logout'),
+		DOGS: makeRoute('/dogs')
 	}
 }
 
@@ -174,15 +185,77 @@ type SearchResult = {
 
 }
 type GetSearch = FetchReponse<SearchResult>
-export const useGetSearch= () => {
-	const { data = {result: {}}, error, isLoading, isValidating } = useSWRImmutable<GetSearch, FetchReponse<null>> (
-		ROUTE.GET.SEARCH,
-		fetcher
+export const useGetSearch = (query?: string) => {
+	const { data, error, isLoading, isValidating } = useSWRImmutable<GetSearch, FetchReponse<null>> (
+		query !== undefined ? `${ROUTE.GET.SEARCH}${query ? `?${query}` : ""}` : null,
+		fetcher,
 	)
 
-	const searchResult = data!
+	const searchResult = data
 	return { 
 		searchResult,
+		error,
+		isLoading,
+		isValidating
+	}
+}
+
+// type GetDogsByIdReturnType = Dog[] | FetchError
+// export function useGetDogsById() {
+// 	const setCurrentDogPageList = useStoreState(s => s.setCurrentDogPageList)
+// 	const {
+// 		trigger,
+// 		data,
+// 		error,
+// 		isMutating
+// 	} = useSWRMutation<GetDogsByIdReturnType, Error, string, DogId[]>(
+// 		ROUTE.POST.DOGS,
+// 		poster,
+// 		{
+// 			onSuccess: (data) => {
+// 				if (Array.isArray(data)) {
+// 					setCurrentDogPageList(data)
+// 				}
+// 				else {
+// 					if (data?.status === 401){
+// 						console.warn('need to log in')
+// 					}
+// 					setCurrentDogPageList([])
+// 					console.warn('failed to get dogs. Returned: ', data)
+// 				}
+// 			}
+// 		}
+// 	)
+
+// 	return {
+// 		triggerGetDogsById: trigger,
+// 		data,
+// 		error,
+// 		isMutating
+// 	}
+// }
+
+/**
+ * This POST function uses useSWRImmutable instead of the typical useMutation to take advantage of caching dog results to prevent uneeded api calls.
+ * @param dogIds 
+ * @returns 
+ */
+export function useGetDogsById(dogIds?: DogId[]) {
+	const { data, error, isLoading, isValidating } = useSWRImmutable<Dog[], FetchError> (
+		//conver dogIds to string for cache key
+		dogIds ? [ROUTE.POST.DOGS, dogIds.join(" ")]: null,
+		//dogIds will be that string here, convert it back to its array form.
+		([url, dogIds]) => poster(url, {arg: (dogIds as string).split(" ")}),
+		{
+			onSuccess: (data) => {
+				console.log('success fetch of post: ', data)
+			}
+		}
+	)
+
+	const dogsResult = data
+	return { 
+		dogsResult,
 		error,
 		isLoading,
 		isValidating
