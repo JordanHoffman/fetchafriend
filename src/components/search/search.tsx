@@ -1,14 +1,16 @@
 'use client'
 
-import { BASE_QUERY, useGetDogsById, useGetSearch, useZip } from "@/api/searchAPI"
+import { useGetDogsById, useGetSearch, useZip } from "@/api/searchAPI"
 import { useStoreState } from "@/appState/store"
 import { useEffect, useState } from "react"
-import { FilterResults } from "./filterResults"
+import { FilterTool } from "./filterTool"
 import { ResultsList } from "./resulstsList"
+import { SortTool } from "./sortTool"
 
 export const Search = () => {
 	const currentSearchQuery = useStoreState(s => s.currentSearchQuery)
 	const setCurrentSearchQuery = useStoreState(s => s.setCurrentSearchQuery)
+	const restartSearchQuery = useStoreState(s => s.restartSearchQuery)
 
 	/* whenever currentQuery updates, it causes a chain reaction which  
 		1) triggers Get /dogs/search to get the id results 
@@ -71,7 +73,7 @@ export const Search = () => {
 				</button>
 				<button
 					className="ml-5"
-					onClick={() => setCurrentSearchQuery(BASE_QUERY)}
+					onClick={restartSearchQuery}
 				>
 					SEARCH
 				</button>
@@ -81,7 +83,8 @@ export const Search = () => {
 				>
 					ZIP
 				</button>
-				<FilterResults />
+				<FilterTool />
+				<SortTool />
 			</div>
 
 			<ResultsList />

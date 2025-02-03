@@ -1,9 +1,13 @@
 import useSWRImmutable from "swr/immutable"
 import { Dog, fetcher, FetchError, FetchReponse, poster, ROUTE } from "./apiBase"
 import useSWRMutation from "swr/mutation"
+import { useEffect } from "react"
+import { useStoreState } from "@/appState/store"
 
 //Goal is to always have consistent queries with backend as frontend keys to minimize repetitious api calls. This is how the backend returns the query for the very first page.
-export const BASE_QUERY = "size=25&from=0"
+export const BASE_CURSOR = "size=25&from=0"
+export const BASE_SORT = `breed${encodeURIComponent(':')}desc=`
+export const BASE_QUERY = `${BASE_CURSOR}&${BASE_SORT}`
 
 type DogBreed = string
 type GetBreeds = FetchReponse<DogBreed[]>
@@ -41,11 +45,17 @@ type SearchResult = {
 }
 type GetSearch = FetchReponse<SearchResult>
 export const useGetSearch = (query?: string) => {
+	const setTotalResults = useStoreState(s => s.setTotalResults)
 	const { data, error, isLoading, isValidating } = useSWRImmutable<GetSearch, FetchReponse<null>> (
 		query !== undefined ? `${ROUTE.GET.SEARCH}${query ? `?${query}` : ""}` : null,
 		fetcher,
 	)
 	const searchResult = data
+	useEffect(() => {
+		if (data?.result) {
+			setTotalResults(data.result.total)
+		}
+	}, [data])
 	return { 
 		searchResult,
 		error,

@@ -1,41 +1,13 @@
 import { Popover, PopoverButton, PopoverPanel, Checkbox } from '@headlessui/react'
-import { BASE_QUERY, useGetBreeds } from '@/api/searchAPI'
+import { useGetBreeds } from '@/api/searchAPI'
 import { useStoreState } from '@/appState/store'
-import { useEffect } from 'react'
 
-export const FilterResults = () => {
+export const FilterTool = () => {
 	const { breeds } = useGetBreeds()
 
 	const filterBreeds = useStoreState(s => s.filterBreeds)
 	const editBreed = useStoreState(s => s.editBreed)
 	const clearBreedFilter = useStoreState(s => s.clearBreedFilter)
-
-	const setCurrentSearchQuery = useStoreState(s => s.setCurrentSearchQuery)
-
-	useEffect(() => {
-		if (filterBreeds) {
-			let queryBreeds = ''
-			const keys = Object.keys(filterBreeds)
-			let usedBreedsCount = 0
-			for (let i = 0; i < keys.length; i++){
-				//a bunch of encodeURIComponent in order to match the text of the api's returned cursors. This makes sure swr keys line up so that un-needed api calls are avoided when navigating back to previous page results.
-				const key = keys[i]
-				if (filterBreeds[key]) {
-					if (!queryBreeds) queryBreeds = `breeds${encodeURIComponent(`[${usedBreedsCount}]`)}=${encodeURIComponent(key)}`
-					else queryBreeds += `&breeds${encodeURIComponent(`[${usedBreedsCount}]`)}=${encodeURIComponent(key)}`
-					usedBreedsCount++
-				}
-			}
-			queryBreeds += `&${BASE_QUERY}`
-			if (queryBreeds) {
-				setCurrentSearchQuery(queryBreeds)
-			}
-			else {
-				setCurrentSearchQuery(``)
-			}
-		}
-	}, [filterBreeds])
-
 
 	return (
 		<Popover className="relative bg-white">
