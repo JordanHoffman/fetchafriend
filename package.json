@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.0",
     "immer": "^10.1.1",
     "next": "15.1.6",
     "react": "^19.0.0",
@@ -27,5 +28,10 @@
     "postcss": "^8",
     "tailwindcss": "^4.0.0",
     "typescript": "^5"
+  },
+  "overrides": {
+    "@headlessui/tailwindcss": {
+      "tailwindcss": "$tailwindcss"
+    }
   }
 }

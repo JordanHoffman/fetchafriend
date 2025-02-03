@@ -1,6 +1,6 @@
 'use client'
 
-import { useGetBreeds } from "@/api/api"
+import { useGetBreeds } from "@/api/searchAPI"
 import { useStoreState } from "@/appState/store"
 import { useEffect } from "react"
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useLogout } from "@/api/api"
+import { useLogout } from "@/api/loginAPI"
 import { useStoreState } from "@/appState/store"
 import { useRouter } from "next/navigation"
 

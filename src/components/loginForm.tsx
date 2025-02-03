@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from "react"
-import { useLogin } from "@/api/api"
+import { useLogin } from "@/api/loginAPI"
 
 export const LoginForm = () => {
 	const { triggerLogin } = useLogin()
