@@ -51,26 +51,7 @@ export const Search = () => {
 	return (
 		<div>
 			<div className="flex gap-3">
-				<button
-					onClick={() => {
-						if (searchResult?.result?.prev) {
-							const newQuery = searchResult.result.prev.split('?')[1]
-							setCurrentSearchQuery(newQuery)
-						}
-					}}
-				>
-					previous
-				</button>
-				<button
-					onClick={() => {
-						if (searchResult?.result?.next) {
-							const newQuery = searchResult.result.next.split('?')[1]
-							setCurrentSearchQuery(newQuery)
-						}
-					}}
-				>
-					next
-				</button>
+
 				<button
 					className="ml-5"
 					onClick={restartSearchQuery}
@@ -83,8 +64,33 @@ export const Search = () => {
 				>
 					ZIP
 				</button>
+				
 				<FilterTool />
 				<SortTool />
+
+				{/* Pagination */}
+				<div>
+					<button
+						onClick={() => {
+							if (searchResult?.result?.prev) {
+								const newQuery = searchResult.result.prev.split('?')[1]
+								setCurrentSearchQuery(newQuery)
+							}
+						}}
+					>
+						previous
+					</button>
+					<button
+						onClick={() => {
+							if (searchResult?.result?.next) {
+								const newQuery = searchResult.result.next.split('?')[1]
+								setCurrentSearchQuery(newQuery)
+							}
+						}}
+					>
+						next
+					</button>
+				</div>
 			</div>
 
 			<ResultsList />

@@ -5,7 +5,10 @@ import { subscribeWithSelector } from "zustand/middleware";
 import { shallow } from "zustand/shallow";
 import { BASE_CURSOR } from "@/api/searchAPI";
 
-type SortTypes = "breed:asc" | "breed:desc" | "name:asc" | "name:desc" | "age:asc" | "age:desc"
+export type SortTypes = "breed:asc" | "breed:desc" | "name:asc" | "name:desc" | "age:asc" | "age:desc"
+export const MIN_AGE = 0
+export const MAX_AGE = 20
+
 type StoreState = {
 	isLoggedIn: boolean,
 	setIsLoggedIn: (newVal: boolean) => void,
@@ -20,18 +23,23 @@ type StoreState = {
 	restartSearchQuery: () => void,
 	totalResults: number,
 	setTotalResults: (newVal: number) => void,
-	sortByQuery: string,
-	setSortBy: (newSort: SortTypes) => void
 
-	//Filtering
+	//Filtering - breeds
 	filterBreeds: Record<string, boolean> | undefined
 	editBreed: (breed: string, newVal: boolean) => void
 	clearBreedFilter: () => void
+	//Filtering - age
+	minAge: number,
+	setMinAge: (age: number) => void,
+	maxAge: number,
+	setMaxAge: (age: number) => void,
 
 	//Sorting
+	sortByQuery: string,
+	setSortBy: (newSort: SortTypes) => void
 }
 
-//Typescript became very buggy so I had to to do repetitive assertion of types such as "false as boolean" so that it would stop complaining.
+//Typescript gave false errors so I had to to do repetitive assertion of types such as "false as boolean" so that it would stop complaining.
 export const useStoreState = create<StoreState>()(
 	subscribeWithSelector (
 		immer (
@@ -63,13 +71,8 @@ export const useStoreState = create<StoreState>()(
 				},
 				totalResults: 0,
 				setTotalResults: newVal => set(() => ({ totalResults: newVal })),
-				sortByQuery: "sort=breed%3Aasc",
-				setSortBy: (newSort) => {
-					const sortByQuery = "sort=" + newSort.split(":").join("%3A")
-					set(() => ({ sortByQuery }))
-				},
 
-				//Filter
+				//Filter - breeds
 				filterBreeds: undefined as (Record<string, boolean> | undefined),
 				editBreed: (breed, newVal) => set(state => {
 					if (!state.filterBreeds) {
@@ -77,7 +80,20 @@ export const useStoreState = create<StoreState>()(
 					}
 					else state.filterBreeds[breed] = newVal
 				}),
-				clearBreedFilter: () => set(() => ({ filterBreeds: {} }))
+				clearBreedFilter: () => set(() => ({ filterBreeds: {} })),
+
+				//Filter - age
+				minAge: MIN_AGE,
+				setMinAge: age => set(() => ({ minAge: age})),
+				maxAge: MAX_AGE,
+				setMaxAge: age => set(() => ({ maxAge: age})),
+
+				//Sorting
+				sortByQuery: "sort=breed%3Aasc",
+				setSortBy: (newSort) => {
+					const sortByQuery = "sort=" + newSort.split(":").join("%3A")
+					set(() => ({ sortByQuery }))
+				},
 			})
 		)
 	)
