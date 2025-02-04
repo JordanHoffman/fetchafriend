@@ -64,53 +64,27 @@ export const useGetSearch = (query?: string) => {
 	}
 }
 
-// type GetDogsByIdReturnType = Dog[] | FetchError
-// export function useGetDogsById() {
-// 	const setCurrentDogPageList = useStoreState(s => s.setCurrentDogPageList)
-// 	const {
-// 		trigger,
-// 		data,
-// 		error,
-// 		isMutating
-// 	} = useSWRMutation<GetDogsByIdReturnType, Error, string, DogId[]>(
-// 		ROUTE.POST.DOGS,
-// 		poster,
-// 		{
-// 			onSuccess: (data) => {
-// 				if (Array.isArray(data)) {
-// 					setCurrentDogPageList(data)
-// 				}
-// 				else {
-// 					if (data?.status === 401){
-// 						console.warn('need to log in')
-// 					}
-// 					setCurrentDogPageList([])
-// 					console.warn('failed to get dogs. Returned: ', data)
-// 				}
-// 			}
-// 		}
-// 	)
-
-// 	return {
-// 		triggerGetDogsById: trigger,
-// 		data,
-// 		error,
-// 		isMutating
-// 	}
-// }
-
 /**
  * This POST function uses useSWRImmutable instead of the typical useMutation to take advantage of caching dog results to prevent uneeded api calls.
  * @param dogIds 
- * @returns 
  */
 export function useGetDogsById(dogIds?: DogId[]) {
 	const { data, error, isLoading, isValidating } = useSWRImmutable<Dog[], FetchError> (
 		//conver dogIds to string for cache key
-		dogIds ? [ROUTE.POST.DOGS, dogIds.join(" ")]: null,
+		(dogIds && dogIds.length) ? [ROUTE.POST.DOGS, dogIds.join(" ")]: null,
 		//dogIds will be that string here, convert it back to its array form.
 		([url, dogIds]) => poster(url, {arg: (dogIds as string).split(" ")}),
 	)
+
+	//special case where initial search returned empty array (no matches). No api call, but return dogResult as empty array to allow app logic to continue from there.
+	if (dogIds?.length === 0) {
+		return {
+			dogsResult:[],
+			error: undefined,
+			isLoading: false,
+			isValidating: false
+		}
+	}
 
 	const dogsResult = data
 	return { 

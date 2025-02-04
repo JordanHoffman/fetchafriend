@@ -1,23 +1,17 @@
 import { MAX_AGE, MIN_AGE, useStoreState } from "@/appState/store"
 import { Slider, SliderValueChangeDetails } from "@ark-ui/react"
 
-
-
 export const AgeFilter = () => {
-
 	const minAge = useStoreState(s => s.minAge)
 	const setMinAge = useStoreState(s => s.setMinAge)
 	const maxAge = useStoreState(s => s.maxAge)
 	const setMaxAge = useStoreState(s => s.setMaxAge)
+	const startSearchQuery = useStoreState(s => s.startSearchQuery)
 
 	const handleValueChange = (details: SliderValueChangeDetails) => {
 		const [minVal, maxVal] = details.value
 		setMinAge(minVal)
 		setMaxAge(maxVal)
-	}
-
-	const handleUpdateQuery = () => {
-
 	}
 
 	return (
@@ -37,7 +31,7 @@ export const AgeFilter = () => {
 				</div>
 				<button 
 					className="rounded-full w-[75px] border-2 border-black"
-					onClick={handleUpdateQuery}
+					onClick={() => startSearchQuery()}
 				>
 					Go
 				</button>

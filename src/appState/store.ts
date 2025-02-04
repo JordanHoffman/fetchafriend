@@ -17,10 +17,10 @@ type StoreState = {
 
 	//Search Query
 	currentSearchQuery: string | undefined,
-	/** trigger a search with a supplied query (this should only be done for the api's returned prev/next queries. Otherwise, use restartSearchQuery when the user changes an option) */
+	/** trigger a search with a supplied query (this should only be done for the api's returned prev/next queries. Otherwise, use startSearchQuery when the user changes an option) */
 	setCurrentSearchQuery: (newVal: string) => void,
-	/** trigger a search based off all user's current options, starting from page 1 */
-	restartSearchQuery: () => void,
+	/** trigger a search based off all user's current options, starting from page 1 if page is not provided */
+	startSearchQuery: (page?: number) => void,
 	totalResults: number,
 	setTotalResults: (newVal: number) => void,
 
@@ -52,19 +52,24 @@ export const useStoreState = create<StoreState>()(
 				//Search Query - made up of cursor, filter, and sort parts. Whenever a cursor or filter changes, trigger a new search. Only trigger a new search when sort changes IF there are actually results to sort.  
 				currentSearchQuery: undefined as (string | undefined),
 				setCurrentSearchQuery: newVal => set(() => ({ currentSearchQuery: newVal})),
-				restartSearchQuery: () => {
+				startSearchQuery: page => {
 					set(state => {
+						/** create a final query of type "foo=xyz&bar=xyz" from parts ["foo=xyz", bar="xyz"] */
 						const addQueryParts = (query: string, parts: string[]) => {
 							let finalQuery = query
 							for (const part of parts) {
+								if (!part) continue //empty strings dont get added
 								finalQuery += finalQuery ? `&${part}` : part
 							}
 							return finalQuery
 						}
 						//build up the search query
 						let query = ''
-						const filterQuery = prepareFilterBreedsQuery(state.filterBreeds)
-						query = addQueryParts(query, [filterQuery, state.sortByQuery, BASE_CURSOR])
+						const breedsQuery = prepareFilterBreedsQuery(state.filterBreeds)
+						const minAgeQuery = state.minAge === MIN_AGE ? '' : `ageMin=${state.minAge}`
+						const maxAgeQuery = state.maxAge === MAX_AGE ? '' : `ageMax=${state.maxAge}`
+						const cursor = page ? `size=25&from=${(page - 1) * 25}` : BASE_CURSOR
+						query = addQueryParts(query, [breedsQuery, minAgeQuery, maxAgeQuery, state.sortByQuery, cursor])
 						//actual trigger happens now:
 						state.currentSearchQuery = query
 					})
@@ -120,8 +125,8 @@ function prepareFilterBreedsQuery(filterBreeds: Record<string, boolean> | undefi
 useStoreState.subscribe(
 	(state) => [state.filterBreeds], ([newFilterBreeds]) => {
 		if (newFilterBreeds) {
-			const restartSearchQuery = useStoreState.getState().restartSearchQuery
-			restartSearchQuery()
+			const startSearchQuery = useStoreState.getState().startSearchQuery
+			startSearchQuery()
 		}
 	},
 	{ equalityFn: shallow } 
@@ -131,8 +136,8 @@ useStoreState.subscribe(
 	(state) => [state.sortByQuery, state.totalResults], ([newSortByQuery, newTotalResults]) => {
 		// only start a new search call if there were actual results (no sense sorting 0 results)
 		if (newTotalResults && newSortByQuery) {
-			const restartSearchQuery = useStoreState.getState().restartSearchQuery
-			restartSearchQuery()
+			const startSearchQuery = useStoreState.getState().startSearchQuery
+			startSearchQuery()
 		}
 	},
 	{ equalityFn: shallow } 

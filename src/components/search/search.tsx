@@ -6,11 +6,12 @@ import { useEffect, useState } from "react"
 import { FilterTool } from "./filterTool"
 import { ResultsList } from "./resulstsList"
 import { SortTool } from "./sortTool"
+import { Paginator } from "./paginator"
 
 export const Search = () => {
 	const currentSearchQuery = useStoreState(s => s.currentSearchQuery)
 	const setCurrentSearchQuery = useStoreState(s => s.setCurrentSearchQuery)
-	const restartSearchQuery = useStoreState(s => s.restartSearchQuery)
+	const startSearchQuery = useStoreState(s => s.startSearchQuery)
 
 	/* whenever currentQuery updates, it causes a chain reaction which  
 		1) triggers Get /dogs/search to get the id results 
@@ -50,11 +51,11 @@ export const Search = () => {
 
 	return (
 		<div>
-			<div className="flex gap-3">
+			<div className="flex flex-col gap-3">
 
 				<button
 					className="ml-5"
-					onClick={restartSearchQuery}
+					onClick={() => startSearchQuery()}
 				>
 					SEARCH
 				</button>
@@ -92,6 +93,11 @@ export const Search = () => {
 					</button>
 				</div>
 			</div>
+
+			<Paginator 
+				prevQuery={searchResult?.result?.prev?.split('?')[1]}
+				nextQuery={searchResult?.result?.next?.split('?')[1]}
+			/>
 
 			<ResultsList />
 		</div>
