@@ -7,6 +7,7 @@ import { FilterTool } from "./filterTool"
 import { ResultsList } from "./resulstsList"
 import { SortTool } from "./sortTool"
 import { Paginator } from "./paginator"
+import { ZipSearch } from "./zipSearch"
 
 export const Search = () => {
 	const currentSearchQuery = useStoreState(s => s.currentSearchQuery)
@@ -59,12 +60,13 @@ export const Search = () => {
 				>
 					SEARCH
 				</button>
-				<button
+				<ZipSearch />
+				{/* <button
 					className="ml-5"
 					onClick={() => {triggerZip(['33180'])}}
 				>
 					ZIP
-				</button>
+				</button> */}
 				
 				<FilterTool />
 				<SortTool />

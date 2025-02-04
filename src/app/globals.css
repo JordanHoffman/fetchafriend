@@ -5,6 +5,19 @@
   --foreground: #171717;
 }
 
+/* Hide spinner on input of type="number" */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
