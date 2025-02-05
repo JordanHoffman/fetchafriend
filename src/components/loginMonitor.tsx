@@ -9,17 +9,25 @@ export const LoginMonitor = () => {
 	const { breeds, error } = useGetBreeds()
 	const router = useRouter()
 	const setIsLoggedIn = useStoreState(s => s.setIsLoggedIn)
+	const isLoggedIn = useStoreState(s => s.isLoggedIn)
+
 	useEffect(() => {
 		if (error && error.status === 401) {
 			setIsLoggedIn(false)
 			if (window.location.pathname.includes('/search')) {
-				router.replace('/login')
+				router.replace('/login?expired=true')
 			}
 		}
 		else if (breeds?.result?.length) {
 			setIsLoggedIn(true)
 		}
 	}, [breeds, error, setIsLoggedIn, router])
+
+	useEffect(() => {
+		if (!isLoggedIn && window.location.pathname.includes('/search')) {
+			router.replace('/login')
+		}
+	}, [isLoggedIn, router])
 
 	return null
 }

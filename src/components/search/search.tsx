@@ -51,21 +51,17 @@ export const Search = () => {
 	}, [searchResult])
 
 	return (
-		<div className={`border-8 rounded-4xl mt-10 px-4 lg:px-8 py-10 ${theme.bg}`}>
-			<div className="flex flex-col lg:flex-row gap-3 lg:gap-10 xl:gap-15">
-				{/* <ZipSearch /> */}
-				<CitySearch />
-				
-				<FilterTool className="xl:min-w-[450px]"/>
-				<SortTool className="max-w-[400px] md:max-w-full lg:max-w-[350px]"/>
+		<>
+			<div className={`border-8 rounded-4xl my-3 my:md-10 px-4 lg:px-8 py-3 sm:py-10 ${theme.bg}`}>
+				<div className="flex flex-col lg:flex-row gap-3 lg:gap-10 xl:gap-15 mb-4">
+					{/* <ZipSearch /> */}
+					<CitySearch />
+					
+					<FilterTool className="xl:min-w-[450px]"/>
+					<SortTool className="max-w-[400px] md:max-w-full lg:max-w-[350px]"/>
+				</div>
 			</div>
-
-			<Paginator 
-				prevQuery={searchResult?.result?.prev?.split('?')[1]}
-				nextQuery={searchResult?.result?.next?.split('?')[1]}
-			/>
-
 			<ResultsList />
-		</div>
+		</>
 	)
 }
