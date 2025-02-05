@@ -83,7 +83,8 @@ export const ROUTE = {
 		LOGIN: makeRoute('/auth/login'),
 		LOGOUT: makeRoute('/auth/logout'),
 		DOGS: makeRoute('/dogs'),
-		LOCATIONS: makeRoute('/locations')
+		LOCATIONS: makeRoute('/locations'),
+		LOCATIONS_SEARCH: makeRoute('/locations/search')
 	}
 }
 

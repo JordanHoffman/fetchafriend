@@ -70,10 +70,9 @@ export const useGetSearch = (query?: string) => {
  */
 export function useGetDogsById(dogIds?: DogId[]) {
 	const { data, error, isLoading, isValidating } = useSWRImmutable<Dog[], FetchError> (
-		//conver dogIds to string for cache key
+		//convert dogIds to string for cache key
 		(dogIds && dogIds.length) ? [ROUTE.POST.DOGS, dogIds.join(" ")]: null,
-		//dogIds will be that string here, convert it back to its array form.
-		([url, dogIds]) => poster(url, {arg: (dogIds as string).split(" ")}),
+		([url]) => poster(url, {arg: dogIds}),
 	)
 
 	//special case where initial search returned empty array (no matches). No api call, but return dogResult as empty array to allow app logic to continue from there.
@@ -96,6 +95,77 @@ export function useGetDogsById(dogIds?: DogId[]) {
 }
 
 
+/**
+ * Goal: get location from a zip, use its lat and long with the formula to get 25 sq. mile. Plug those into geoBoundingBox to get list of zips to include for dog search.
+ */
+type ZipResponse = {
+	city: string,
+	latitude: number,
+	county: string,
+	state: string,
+	zip_code: string,
+	longitutde: number
+} 
+export function useZipLocation(zip?: string) {
+	const { data, error, isLoading, isValidating } = useSWRImmutable<ZipResponse[], FetchError> (
+		(zip && zip.length) ? [ROUTE.POST.LOCATIONS, zip]: null,
+		([url, zip]) => poster(url, {arg: [zip]}),
+	)
+
+	//special case where initial search returned empty array (no matches). No api call, but return dogResult as empty array to allow app logic to continue from there.
+	if (!zip) {
+		return {
+			locationResult: null,
+			error: undefined,
+			isLoading: false,
+			isValidating: false
+		}
+	}
+
+	const locationResult = data
+	return { 
+		locationResult,
+		error,
+		isLoading,
+		isValidating
+	}
+}
+
+type LatLong = {
+	lat: number
+	lon: number
+}
+export type Bounds = {
+	bottom_left: LatLong,
+	top_right: LatLong
+}
+export function useLocationSearch(bounds?: Bounds) {
+	const boundsCacheKey= bounds ? `${bounds.bottom_left.lat}|${bounds.bottom_left.lon}_${bounds.top_right.lat}|${bounds.top_right.lon}` : ""
+	const { data, error, isLoading, isValidating } = useSWRImmutable<ZipResponse[], FetchError> (
+		bounds ? [ROUTE.POST.LOCATIONS_SEARCH, boundsCacheKey]: null,
+		([url]) => poster(url, {arg: bounds}),
+	)
+
+	//special case where initial search returned empty array (no matches). No api call, but return dogResult as empty array to allow app logic to continue from there.
+	if (!bounds) {
+		return {
+			locationResult: null,
+			error: undefined,
+			isLoading: false,
+			isValidating: false
+		}
+	}
+
+	const locationResult = data
+	return { 
+		locationResult,
+		error,
+		isLoading,
+		isValidating
+	}
+}
+
+
 export function useZip() {
 	const {
 		trigger,
@@ -104,7 +174,8 @@ export function useZip() {
 		isMutating
 	} = useSWRMutation(
 		ROUTE.POST.LOCATIONS,
-		poster<string[]>
+		poster<string[]>,
+		
 	)
 
 	return {
@@ -114,45 +185,3 @@ export function useZip() {
 		isMutating
 	}
 }
-
-/*
-
-Chat gpt for utility functions to get radius bounding box for given zip:
-
-// Earth's radius in miles
-const EARTH_RADIUS_MILES = 3960;
-
-// Function to calculate the latitude and longitude changes for a given distance (in miles)
-function getBoundingBox(lat, lon, distance) {
-  // Calculate latitude change
-  const deltaLat = distance / EARTH_RADIUS_MILES;
-  
-  // Convert latitude to radians for the cosine calculation
-  const latRad = (lat * Math.PI) / 180;
-  
-  // Calculate longitude change, adjusting for latitude
-  const deltaLon = distance / (EARTH_RADIUS_MILES * Math.cos(latRad));
-
-  // Calculate top-right and bottom-left coordinates
-  const topRightLat = lat + deltaLat;
-  const topRightLon = lon + deltaLon;
-
-  const bottomLeftLat = lat - deltaLat;
-  const bottomLeftLon = lon - deltaLon;
-
-  return {
-    topRight: { lat: topRightLat, lon: topRightLon },
-    bottomLeft: { lat: bottomLeftLat, lon: bottomLeftLon }
-  };
-}
-
-// Example usage:
-const lat = 37.7749;  // San Francisco latitude
-const lon = -122.4194;  // San Francisco longitude
-const distance = 25;  // 25 miles radius
-
-const boundingBox = getBoundingBox(lat, lon, distance);
-console.log("Top-right:", boundingBox.topRight);
-console.log("Bottom-left:", boundingBox.bottomLeft);
-
-*/

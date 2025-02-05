@@ -24,6 +24,9 @@ type StoreState = {
 	totalResults: number,
 	setTotalResults: (newVal: number) => void,
 
+	//Filtering - zip codes
+	desiredZips: string[],
+	setDesiredZips: (newVal: string[]) => void,
 	//Filtering - breeds
 	filterBreeds: Record<string, boolean> | undefined
 	editBreed: (breed: string, newVal: boolean) => void
@@ -55,21 +58,23 @@ export const useStoreState = create<StoreState>()(
 				startSearchQuery: page => {
 					set(state => {
 						/** create a final query of type "foo=xyz&bar=xyz" from parts ["foo=xyz", bar="xyz"] */
-						const addQueryParts = (query: string, parts: string[]) => {
-							let finalQuery = query
+						const addQueryParts = (parts: string[]) => {
+							let finalQuery = ''
 							for (const part of parts) {
 								if (!part) continue //empty strings dont get added
 								finalQuery += finalQuery ? `&${part}` : part
 							}
 							return finalQuery
 						}
+
 						//build up the search query
-						let query = ''
+						const zipQuery = prepareZipQuery(state.desiredZips)
 						const breedsQuery = prepareFilterBreedsQuery(state.filterBreeds)
 						const minAgeQuery = state.minAge === MIN_AGE ? '' : `ageMin=${state.minAge}`
 						const maxAgeQuery = state.maxAge === MAX_AGE ? '' : `ageMax=${state.maxAge}`
 						const cursor = page ? `size=25&from=${(page - 1) * 25}` : BASE_CURSOR
-						query = addQueryParts(query, [breedsQuery, minAgeQuery, maxAgeQuery, state.sortByQuery, cursor])
+
+						const query = addQueryParts([zipQuery, breedsQuery, minAgeQuery, maxAgeQuery, state.sortByQuery, cursor])
 						//actual trigger happens now:
 						state.currentSearchQuery = query
 					})
@@ -77,6 +82,9 @@ export const useStoreState = create<StoreState>()(
 				totalResults: 0,
 				setTotalResults: newVal => set(() => ({ totalResults: newVal })),
 
+				//Filter - zip codes
+				desiredZips: [] as string[],
+				setDesiredZips: newVal => set(() => ({ desiredZips: newVal })),
 				//Filter - breeds
 				filterBreeds: undefined as (Record<string, boolean> | undefined),
 				editBreed: (breed, newVal) => set(state => {
@@ -103,6 +111,18 @@ export const useStoreState = create<StoreState>()(
 		)
 	)
 )
+
+function prepareZipQuery(zipCodes: string[]) {
+	if (!zipCodes.length) {
+		return ''
+	}
+	let queryZips = ''
+	for (let i=0; i < zipCodes.length; i++) {
+		if (!queryZips) queryZips = `zipCodes${encodeURIComponent(`[${i}]`)}=${zipCodes[i]}`
+		else queryZips += `&zipCodes${encodeURIComponent(`[${i}]`)}=${zipCodes[i]}`
+	}
+	return queryZips
+}
 
 function prepareFilterBreedsQuery(filterBreeds: Record<string, boolean> | undefined) {
 	if (!filterBreeds) return ''
