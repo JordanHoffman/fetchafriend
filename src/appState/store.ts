@@ -117,7 +117,8 @@ function prepareZipQuery(zipCodes: string[]) {
 		return ''
 	}
 	let queryZips = ''
-	for (let i=0; i < zipCodes.length; i++) {
+	//I could not get api to accept query of array unless it was in the form 'zipCodes[0]=12345&zipCodes[1]=23456' etc.
+	for (let i = 0; i < zipCodes.length; i++) {
 		if (!queryZips) queryZips = `zipCodes${encodeURIComponent(`[${i}]`)}=${zipCodes[i]}`
 		else queryZips += `&zipCodes${encodeURIComponent(`[${i}]`)}=${zipCodes[i]}`
 	}

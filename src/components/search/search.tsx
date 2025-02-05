@@ -1,6 +1,6 @@
 'use client'
 
-import { useGetDogsById, useGetSearch, useZip } from "@/api/searchAPI"
+import { useGetDogsById, useGetSearch } from "@/api/searchAPI"
 import { useStoreState } from "@/appState/store"
 import { useEffect, useState } from "react"
 import { FilterTool } from "./filterTool"
@@ -8,6 +8,8 @@ import { ResultsList } from "./resulstsList"
 import { SortTool } from "./sortTool"
 import { Paginator } from "./paginator"
 import { ZipSearch } from "./zipSearch"
+import { CitySearch } from "./citySearch"
+import { theme } from "@/theme"
 
 export const Search = () => {
 	const currentSearchQuery = useStoreState(s => s.currentSearchQuery)
@@ -48,52 +50,14 @@ export const Search = () => {
 		}
 	}, [searchResult])
 
-	const { triggerZip } = useZip()
-
 	return (
-		<div>
-			<div className="flex flex-col gap-3">
-
-				<button
-					className="ml-5"
-					onClick={() => startSearchQuery()}
-				>
-					SEARCH
-				</button>
-				<ZipSearch />
-				{/* <button
-					className="ml-5"
-					onClick={() => {triggerZip(['33180'])}}
-				>
-					ZIP
-				</button> */}
+		<div className={`border-8 rounded-4xl mt-10 px-4 lg:px-8 py-10 ${theme.bg}`}>
+			<div className="flex flex-col lg:flex-row gap-3 lg:gap-10 xl:gap-15">
+				{/* <ZipSearch /> */}
+				<CitySearch />
 				
-				<FilterTool />
-				<SortTool />
-
-				{/* Pagination */}
-				<div>
-					<button
-						onClick={() => {
-							if (searchResult?.result?.prev) {
-								const newQuery = searchResult.result.prev.split('?')[1]
-								setCurrentSearchQuery(newQuery)
-							}
-						}}
-					>
-						previous
-					</button>
-					<button
-						onClick={() => {
-							if (searchResult?.result?.next) {
-								const newQuery = searchResult.result.next.split('?')[1]
-								setCurrentSearchQuery(newQuery)
-							}
-						}}
-					>
-						next
-					</button>
-				</div>
+				<FilterTool className="xl:min-w-[450px]"/>
+				<SortTool className="max-w-[400px] md:max-w-full lg:max-w-[350px]"/>
 			</div>
 
 			<Paginator 

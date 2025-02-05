@@ -1,6 +1,6 @@
 import useSWRImmutable from "swr/immutable"
 import { Dog, fetcher, FetchError, FetchReponse, poster, ROUTE } from "./apiBase"
-import useSWRMutation from "swr/mutation"
+// import useSWRMutation from "swr/mutation"
 import { useEffect } from "react"
 import { useStoreState } from "@/appState/store"
 
@@ -18,7 +18,7 @@ export function useGetBreeds() {
 		{ 
 			onErrorRetry: async (error: FetchReponse<null>, key, config, revalidate, { retryCount }) => {
 				console.log('error retry')
-				const e = await error
+				const e = error
 				if (e.status === 401) return
 				if (retryCount >= 3) return
 				setTimeout(() => revalidate({ retryCount }), 1000)
@@ -98,16 +98,16 @@ export function useGetDogsById(dogIds?: DogId[]) {
 /**
  * Goal: get location from a zip, use its lat and long with the formula to get 25 sq. mile. Plug those into geoBoundingBox to get list of zips to include for dog search.
  */
-type ZipResponse = {
+type GeoLoc = {
 	city: string,
 	latitude: number,
 	county: string,
 	state: string,
 	zip_code: string,
-	longitutde: number
+	longitude: number
 } 
 export function useZipLocation(zip?: string) {
-	const { data, error, isLoading, isValidating } = useSWRImmutable<ZipResponse[], FetchError> (
+	const { data, error, isLoading, isValidating } = useSWRImmutable<GeoLoc[], FetchError> (
 		(zip && zip.length) ? [ROUTE.POST.LOCATIONS, zip]: null,
 		([url, zip]) => poster(url, {arg: [zip]}),
 	)
@@ -139,49 +139,72 @@ export type Bounds = {
 	bottom_left: LatLong,
 	top_right: LatLong
 }
+export type LocationSearchResult = {
+	results: GeoLoc[],
+	total: number
+}
 export function useLocationSearch(bounds?: Bounds) {
 	const boundsCacheKey= bounds ? `${bounds.bottom_left.lat}|${bounds.bottom_left.lon}_${bounds.top_right.lat}|${bounds.top_right.lon}` : ""
-	const { data, error, isLoading, isValidating } = useSWRImmutable<ZipResponse[], FetchError> (
+
+	const { data, error, isLoading, isValidating } = useSWRImmutable<LocationSearchResult, FetchError> (
 		bounds ? [ROUTE.POST.LOCATIONS_SEARCH, boundsCacheKey]: null,
-		([url]) => poster(url, {arg: bounds}),
+		([url]) => poster(url, {arg: {geoBoundingBox: {...bounds}}}),
+		{ 
+			onErrorRetry: async (error: FetchReponse<null>, key, config, revalidate, { retryCount }) => {
+				console.error(`error useLocationSearch: ${error}`)
+				return
+			}
+		}
 	)
 
 	//special case where initial search returned empty array (no matches). No api call, but return dogResult as empty array to allow app logic to continue from there.
 	if (!bounds) {
 		return {
-			locationResult: null,
+			locationSearchResult: null,
 			error: undefined,
 			isLoading: false,
 			isValidating: false
 		}
 	}
 
-	const locationResult = data
+	const locationSearchResult = data
 	return { 
-		locationResult,
+		locationSearchResult,
 		error,
 		isLoading,
 		isValidating
 	}
 }
 
+export function usePlaceSearch(city?: string) {
+	city = city?.toLowerCase()
 
-export function useZip() {
-	const {
-		trigger,
-		data,
-		error,
-		isMutating
-	} = useSWRMutation(
-		ROUTE.POST.LOCATIONS,
-		poster<string[]>,
-		
+	const { data, error, isLoading, isValidating } = useSWRImmutable<LocationSearchResult, FetchError> (
+		city ? [ROUTE.POST.LOCATIONS_SEARCH, city]: null,
+		([url]) => poster(url, {arg: { city }}),
+		{ 
+			onErrorRetry: async (error: FetchReponse<null>, key, config, revalidate, { retryCount }) => {
+				console.error(`error useLocationSearch: ${error}`)
+				return
+			}
+		}
 	)
 
-	return {
-		triggerZip: trigger,
-		data,
+	//special case where initial search returned empty array (no matches). No api call, but return dogResult as empty array to allow app logic to continue from there.
+	if (!city) {
+		return {
+			locationSearchResult: null,
+			error: undefined,
+			isLoading: false,
+			isValidating: false
+		}
+	}
+
+	const placeSearchResult = data
+	return { 
+		placeSearchResult,
 		error,
-		isMutating
+		isLoading,
+		isValidating
 	}
 }

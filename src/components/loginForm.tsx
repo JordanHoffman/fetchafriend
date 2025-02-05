@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useLogin } from "@/api/loginAPI"
+import { theme } from "@/theme"
 
 export const LoginForm = () => {
 	const { triggerLogin } = useLogin()
@@ -18,7 +19,7 @@ export const LoginForm = () => {
 	};
 
 	return (
-		<form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4 border rounded-md w-80">
+		<form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4 w-80 mx-auto max-w-full">
 			<input
 				type="text"
 				name="name"
@@ -26,7 +27,7 @@ export const LoginForm = () => {
 				value={formData.name}
 				onChange={handleChange}
 				required
-				className="p-2 border rounded"
+				className="p-2 border-2 rounded-xl bg-white text-lg"
 			/>
 			<input
 				type="text"
@@ -35,9 +36,9 @@ export const LoginForm = () => {
 				value={formData.email}
 				onChange={handleChange}
 				required
-				className="p-2 border rounded"
+				className="p-2 border-2 rounded-xl bg-white text-lg"
 			/>
-			<button type="submit" className="p-2 bg-blue-500 text-white rounded">
+			<button type="submit" className={`p-2 text-white rounded ${theme.bgDark} rounded-full text-lg font-medium`}>
 				Submit
 			</button>
 		</form>
