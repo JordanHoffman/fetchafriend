@@ -10,50 +10,55 @@ export const MIN_AGE = 0
 export const MAX_AGE = 20
 
 type StoreState = {
-	isLoggedIn: boolean,
-	setIsLoggedIn: (newVal: boolean) => void,
-	currentDogPageList: Dog[],
-	setCurrentDogPageList: (newVal: Dog[]) => void,
+	/** undefined indicates is hasn't been checked yet */
+	isLoggedIn: boolean | undefined
+	setIsLoggedIn: (newVal: boolean) => void
+	currentDogPageList: Dog[]
+	setCurrentDogPageList: (newVal: Dog[]) => void
 
 	//Search Query
-	currentSearchQuery: string | undefined,
+	currentSearchQuery: string | undefined
 	/** trigger a search with a supplied query (this should only be done for the api's returned prev/next queries. Otherwise, use startSearchQuery when the user changes an option) */
-	setCurrentSearchQuery: (newVal: string) => void,
+	setCurrentSearchQuery: (newVal: string) => void
 	/** trigger a search based off all user's current options, starting from page 1 if page is not provided */
-	startSearchQuery: (page?: number) => void,
-	totalResults: number,
-	setTotalResults: (newVal: number) => void,
+	startSearchQuery: (page?: number) => void
+	totalResults: number
+	setTotalResults: (newVal: number) => void
 
 	//Filtering - zip codes
-	desiredZips: string[],
-	setDesiredZips: (newVal: string[]) => void,
+	desiredZips: string[]
+	setDesiredZips: (newVal: string[]) => void
 	//Filtering - breeds
 	filterBreeds: Record<string, boolean> | undefined
 	editBreed: (breed: string, newVal: boolean) => void
 	clearBreedFilter: () => void
 	//Filtering - age
-	minAge: number,
-	setMinAge: (age: number) => void,
-	maxAge: number,
-	setMaxAge: (age: number) => void,
-
+	minAge: number
+	setMinAge: (age: number) => void
+	maxAge: number
+	setMaxAge: (age: number) => void
 	//Sorting
-	sortByQuery: string,
+	sortByQuery: string
 	setSortBy: (newSort: SortTypes) => void
+
+	//favorites:
+	favorites: Record<Dog['id'], boolean>
+	toggleFavorite: (dogId: Dog['id']) => void
+	resetFavorites: () => void
 }
 
-//Typescript gave false errors so I had to to do repetitive assertion of types such as "false as boolean" so that it would stop complaining.
+//TS gave false errors so I had to to do repetitive assertions for it to stop complaining (ex "undefined as boolean | undefined").
 export const useStoreState = create<StoreState>()(
 	subscribeWithSelector (
 		immer (
 			set => ({
-				isLoggedIn: false as boolean,
+				isLoggedIn: undefined as boolean | undefined,
 				setIsLoggedIn: newVal => set(() => ({ isLoggedIn: newVal })),
 				currentDogPageList: [] as Dog[],
 				setCurrentDogPageList: newVal => set(() => ({ currentDogPageList: newVal})),
 
 				//Search Query - made up of cursor, filter, and sort parts. Whenever a cursor or filter changes, trigger a new search. Only trigger a new search when sort changes IF there are actually results to sort.  
-				currentSearchQuery: undefined as (string | undefined),
+				currentSearchQuery: undefined as string | undefined,
 				setCurrentSearchQuery: newVal => set(() => ({ currentSearchQuery: newVal})),
 				startSearchQuery: page => {
 					set(state => {
@@ -107,6 +112,13 @@ export const useStoreState = create<StoreState>()(
 					const sortByQuery = "sort=" + newSort.split(":").join("%3A")
 					set(() => ({ sortByQuery }))
 				},
+
+				//favorites
+				favorites: {},
+				toggleFavorite: dogId => { set(state => { 
+					state.favorites[dogId] = !state.favorites[dogId]
+				})},
+				resetFavorites: () => { set(state => {state.favorites = {}})}
 			})
 		)
 	)
@@ -132,7 +144,7 @@ function prepareFilterBreedsQuery(filterBreeds: Record<string, boolean> | undefi
 	const keys = Object.keys(filterBreeds)
 	let usedBreedsCount = 0
 	for (let i = 0; i < keys.length; i++){
-		//a bunch of encodeURIComponent in order to match the text of the api's returned cursors. This makes sure swr keys line up so that un-needed api calls are avoided when navigating back to previous page results.
+		//a bunch of encodeURIComponent in order to match the text of the api's returned cursors. This makes sure swr keys line up for caching so that un-needed api calls are avoided when navigating back to previous page results.
 		const key = keys[i]
 		if (filterBreeds[key]) {
 			if (!queryBreeds) queryBreeds = `breeds${encodeURIComponent(`[${usedBreedsCount}]`)}=${encodeURIComponent(key)}`
@@ -143,6 +155,7 @@ function prepareFilterBreedsQuery(filterBreeds: Record<string, boolean> | undefi
 	return queryBreeds
 }
 
+//subscription for monitoring changes to filtering and updatig searches based off them
 useStoreState.subscribe(
 	(state) => [state.filterBreeds], ([newFilterBreeds]) => {
 		if (newFilterBreeds) {
@@ -153,6 +166,7 @@ useStoreState.subscribe(
 	{ equalityFn: shallow } 
 )
 
+//Subscription for monitoring changes to sorting and updating searches based off them
 useStoreState.subscribe(
 	(state) => [state.sortByQuery, state.totalResults], ([newSortByQuery, newTotalResults]) => {
 		// only start a new search call if there were actual results (no sense sorting 0 results)

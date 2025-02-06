@@ -6,10 +6,11 @@ import { useState } from 'react'
 export const Paginator = ({
 	prevQuery, 
 	nextQuery,
-
+	className="",
 }:{
 	prevQuery?: string,
 	nextQuery?: string,
+	className?: string,
 }) => {
 	const setCurrentSearchQuery = useStoreState(s => s.setCurrentSearchQuery)
 	const startSearchQuery = useStoreState(s => s.startSearchQuery)
@@ -42,7 +43,7 @@ export const Paginator = ({
 			pageSize={25} 
 			siblingCount={2}
 			// className='flex flex-wrap gap-1 max-w-[250px] min-[450px]:max-w-full'
-			className='flex gap-1'
+			className={`flex gap-1 ${className}`}
 			page={currentPage}
 			onPageChange={handlePageChange}
 		>

@@ -1,8 +1,8 @@
 import { useStoreState } from "@/appState/store"
 import { theme } from "@/theme"
-import Image from "next/image"
 import { Paginator } from "./paginator"
 import { useGetSearch } from "@/api/searchAPI"
+import { ResultItem } from "./resultItem"
 
 export const ResultsList = () => {
 	const dogs = useStoreState(s => s.currentDogPageList)
@@ -18,54 +18,40 @@ export const ResultsList = () => {
 		)
 	}
 
+	const mdTwoPerRow = "md:w-0 md:basis-34/100 md:grow md:max-w-1/2"
+	const xlThreePerRow = "xl:w-0 xl:basis-26/100 xl:grow xl:max-w-1/3"
 	return (
 		<section
-			className={`container py-5 border-8 rounded-4xl ${theme.bg}`}
+			className={`container px-0 sm:px-3 py-5 border-8 rounded-4xl ${theme.bg}`}
 		>
-			<h2
-				className={`text-4xl md:text-5xl ${theme.text} font-bold mb-3`}
-			>
-				Results:
-			</h2>
+			<div className="flex flex-wrap gap-3 md:gap-10 items-center px-3 sm:px-0 mb-8">
+				<h2
+					className={`text-4xl md:text-5xl ${theme.text} font-bold`}
+				>
+					Results:
+				</h2>
+				<button className={`rounded-full px-5 py-1 font-semibold text-2xl bg-rose-300 text-white border-4 ${theme.border} tracking-wide`}>
+					Find My Match!
+				</button>
+			</div>
+
 			<Paginator 
 				prevQuery={searchResult?.result?.prev?.split('?')[1]}
 				nextQuery={searchResult?.result?.next?.split('?')[1]}
+				className="px-3 sm:px-0 mb-8"
 			/>
-			{
-				dogs.map(dog => {
-					return (
-						<div
-							key={dog.id}
-							className="flex w-full gap-3"
-						>
-							<div>
-								<div>
-									{dog.name}
-								</div>
-								<div className="relative w-[100px] h-[100px]">
-									<Image
-										alt={`a ${dog.breed} named ${dog.name}`}
-										src={dog.img}
-										fill={true}
-										className="object-contain"
-										sizes="(max-width: 768px) 100px, (max-width: 1200px) 100px, 100px"
-									/>
-								</div>
-							</div>
-
-							<div>
-								{dog.breed}
-							</div>
-							<div>
-								{dog.age}
-							</div>
-							<div>
-								{dog.zip_code}
-							</div>
-						</div>
-					)
-				})
-			}
+			<div className="flex flex-wrap sm:gap-2 mb-8">
+				{ dogs.map(dog => <ResultItem 
+					key={dog.id} 
+					dog={dog} 
+					className={`w-full ${mdTwoPerRow} ${xlThreePerRow}`}
+				/>) }
+			</div>
+			<Paginator 
+				prevQuery={searchResult?.result?.prev?.split('?')[1]}
+				nextQuery={searchResult?.result?.next?.split('?')[1]}
+				className="px-3 sm:px-0 mb-5"
+			/>
 		</section>
 	)
 }

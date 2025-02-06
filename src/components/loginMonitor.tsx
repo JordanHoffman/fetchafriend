@@ -24,7 +24,7 @@ export const LoginMonitor = () => {
 	}, [breeds, error, setIsLoggedIn, router])
 
 	useEffect(() => {
-		if (!isLoggedIn && window.location.pathname.includes('/search')) {
+		if (isLoggedIn === false && window.location.pathname.includes('/search')) {
 			router.replace('/login')
 		}
 	}, [isLoggedIn, router])
