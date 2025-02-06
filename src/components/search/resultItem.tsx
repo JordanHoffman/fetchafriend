@@ -2,6 +2,7 @@ import { Dog } from "@/api/apiBase"
 import { useStoreState } from "@/appState/store"
 import { theme } from "@/theme"
 import Image from "next/image"
+import { DogDialog } from "../dialog/dogDialog"
 
 export const ResultItem = ({
 	dog,
@@ -12,6 +13,7 @@ export const ResultItem = ({
 }) => {
 	const favorites = useStoreState(s => s.favorites)
 	const toggleFavorite = useStoreState(s => s.toggleFavorite)
+	const showDialog = useStoreState(s => s.showDialog)
 
 	const labelStyling = "flex flex-col sm:flex-row"
 
@@ -35,7 +37,10 @@ export const ResultItem = ({
 					<div className={`${labelStyling} mb-3`}>
 						{getLabel('Name', dog.name, "md:flex-col")}
 					</div>
-					<div className={`relative w-[100px] h-[100px]`}>
+					<button 
+						onClick={() => showDialog(<DogDialog dog={dog} />)}
+						className={`relative w-[100px] h-[100px]`}
+					>
 						<Image
 							alt={`a ${dog.breed} named ${dog.name}`}
 							src={dog.img}
@@ -43,7 +48,7 @@ export const ResultItem = ({
 							className={`object-cover max-w-full max-h-full rounded-xl ${theme.border} border-2`}
 							sizes="(max-width: 768px) 100px, (max-width: 1200px) 100px, 100px"
 						/>
-					</div>
+					</button>
 				</div>
 
 				<div className="flex flex-col gap-1">

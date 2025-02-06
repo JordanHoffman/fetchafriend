@@ -62,7 +62,7 @@ export async function poster<T> (
 	const contentType = r.headers.get("content-type")
 
 	if (!r.ok) {
-		return prepareResponseError(r)
+		throw(prepareResponseError(r))
 	}
 	if (contentType?.includes('text/plain')) {
 		return r.text()
@@ -83,6 +83,7 @@ export const ROUTE = {
 		LOGIN: makeRoute('/auth/login'),
 		LOGOUT: makeRoute('/auth/logout'),
 		DOGS: makeRoute('/dogs'),
+		DOGS_MATCH: makeRoute('/dogs/match'),
 		LOCATIONS: makeRoute('/locations'),
 		LOCATIONS_SEARCH: makeRoute('/locations/search')
 	}

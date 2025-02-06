@@ -4,6 +4,7 @@ import { immer } from "zustand/middleware/immer";
 import { subscribeWithSelector } from "zustand/middleware";
 import { shallow } from "zustand/shallow";
 import { BASE_CURSOR } from "@/api/searchAPI";
+import { type ReactNode } from "react";
 
 export type SortTypes = "breed:asc" | "breed:desc" | "name:asc" | "name:desc" | "age:asc" | "age:desc"
 export const MIN_AGE = 0
@@ -13,7 +14,7 @@ type StoreState = {
 	/** undefined indicates is hasn't been checked yet */
 	isLoggedIn: boolean | undefined
 	setIsLoggedIn: (newVal: boolean) => void
-	currentDogPageList: Dog[]
+	currentDogPageList: Dog[] | undefined
 	setCurrentDogPageList: (newVal: Dog[]) => void
 
 	//Search Query
@@ -45,6 +46,12 @@ type StoreState = {
 	favorites: Record<Dog['id'], boolean>
 	toggleFavorite: (dogId: Dog['id']) => void
 	resetFavorites: () => void
+
+	//Dialog
+	dialogIsOpen: boolean
+	dialogContent: null | ReactNode
+	showDialog: (dialogContent: ReactNode) => void
+	closeDialog: () => void
 }
 
 //TS gave false errors so I had to to do repetitive assertions for it to stop complaining (ex "undefined as boolean | undefined").
@@ -54,7 +61,7 @@ export const useStoreState = create<StoreState>()(
 			set => ({
 				isLoggedIn: undefined as boolean | undefined,
 				setIsLoggedIn: newVal => set(() => ({ isLoggedIn: newVal })),
-				currentDogPageList: [] as Dog[],
+				currentDogPageList: undefined as Dog[] | undefined,
 				setCurrentDogPageList: newVal => set(() => ({ currentDogPageList: newVal})),
 
 				//Search Query - made up of cursor, filter, and sort parts. Whenever a cursor or filter changes, trigger a new search. Only trigger a new search when sort changes IF there are actually results to sort.  
@@ -118,7 +125,17 @@ export const useStoreState = create<StoreState>()(
 				toggleFavorite: dogId => { set(state => { 
 					state.favorites[dogId] = !state.favorites[dogId]
 				})},
-				resetFavorites: () => { set(state => {state.favorites = {}})}
+				resetFavorites: () => { set(state => {state.favorites = {}})},
+
+				//Dialog
+				dialogIsOpen: false as boolean,
+				dialogContent: null as null | ReactNode,
+				showDialog: (dialogContent: React.ReactNode) => set({
+					dialogIsOpen: true, dialogContent: dialogContent 
+				}),
+				closeDialog: () => set({ 
+					dialogIsOpen: false, dialogContent: null 
+				}),
 			})
 		)
 	)

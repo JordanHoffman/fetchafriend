@@ -6,28 +6,21 @@ import { useEffect, useState } from "react"
 import { FilterTool } from "./filterTool"
 import { ResultsList } from "./resulstsList"
 import { SortTool } from "./sortTool"
-import { Paginator } from "./paginator"
 import { ZipSearch } from "./zipSearch"
 import { CitySearch } from "./citySearch"
 import { theme } from "@/theme"
 
 export const Search = () => {
-	const currentSearchQuery = useStoreState(s => s.currentSearchQuery)
-	const setCurrentSearchQuery = useStoreState(s => s.setCurrentSearchQuery)
-	const startSearchQuery = useStoreState(s => s.startSearchQuery)
-
 	/* whenever currentQuery updates, it causes a chain reaction which  
 		1) triggers Get /dogs/search to get the id results 
 		2) triggers POST /dogs with those id results in order to get final dog object list. 
 		Conclusion: only update currentQuery when you want new data.
 	*/
+	const currentSearchQuery = useStoreState(s => s.currentSearchQuery)
 	const [nextQuery, setNextQuery] = useState<string | undefined>(undefined)
-
 	const setCurrentDogPageList = useStoreState(s => s.setCurrentDogPageList)
-
 	const { searchResult } = useGetSearch(currentSearchQuery)
 	const { dogsResult } = useGetDogsById(searchResult?.result?.resultIds)
-
 	const { searchResult: nextSearchResult } = useGetSearch(nextQuery)
 	useGetDogsById(nextSearchResult?.result.resultIds)
 

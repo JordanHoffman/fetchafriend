@@ -3,6 +3,7 @@ import { Dog, fetcher, FetchError, FetchReponse, poster, ROUTE } from "./apiBase
 // import useSWRMutation from "swr/mutation"
 import { useEffect } from "react"
 import { useStoreState } from "@/appState/store"
+import useSWRMutation from "swr/mutation"
 
 //Goal is to always have consistent queries with backend as frontend keys to minimize repetitious api calls. This is how the backend returns the query for the very first page.
 export const BASE_CURSOR = "size=25&from=0"
@@ -43,7 +44,7 @@ type SearchResult = {
 	prev?: string
 
 }
-type GetSearch = FetchReponse<SearchResult>
+export type GetSearch = FetchReponse<SearchResult>
 export const useGetSearch = (query?: string) => {
 	const setTotalResults = useStoreState(s => s.setTotalResults)
 	const { data, error, isLoading, isValidating } = useSWRImmutable<GetSearch, FetchReponse<null>> (
@@ -91,6 +92,31 @@ export function useGetDogsById(dogIds?: DogId[]) {
 		error,
 		isLoading,
 		isValidating
+	}
+}
+
+export function useFavoritesSearch() {
+	const { 
+		trigger,
+		data,
+		error,
+		isMutating
+	} = useSWRMutation<{match: string}, FetchError, string, DogId[]>(
+		ROUTE.POST.DOGS_MATCH, 
+		poster,
+		{
+			onError: err => {
+				if (err.status === 401) return
+				else console.error("error finding match: ", err)
+			}
+		}	
+		
+	)
+	return {
+		triggerFavoritesSearch: trigger,
+		data,
+		error,
+		isMutating
 	}
 }
 

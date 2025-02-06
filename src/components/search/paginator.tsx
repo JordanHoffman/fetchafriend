@@ -4,15 +4,10 @@ import { Pagination } from '@ark-ui/react/pagination'
 import { useState } from 'react'
 
 export const Paginator = ({
-	prevQuery, 
-	nextQuery,
 	className="",
 }:{
-	prevQuery?: string,
-	nextQuery?: string,
 	className?: string,
 }) => {
-	const setCurrentSearchQuery = useStoreState(s => s.setCurrentSearchQuery)
 	const startSearchQuery = useStoreState(s => s.startSearchQuery)
 	const totalResults = useStoreState(s => s.totalResults)
 	const [currentPage, setCurrentPage] = useState(1)
@@ -24,17 +19,7 @@ export const Paginator = ({
 	const handlePageChange = (details: Pagination.PageChangeDetails) => {
 		const { page } = details
 		setCurrentPage(page)
-		const isNextPage = page === currentPage + 1
-		const isPrevPage = page === currentPage - 1
-		if (isNextPage && nextQuery) {
-			setCurrentSearchQuery(nextQuery)
-		}
-		else if (isPrevPage && prevQuery) {
-			setCurrentSearchQuery(prevQuery)
-		}
-		else {
-			startSearchQuery(page)
-		}
+		startSearchQuery(page)
 	}
 
 	return (

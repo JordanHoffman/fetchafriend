@@ -4,6 +4,7 @@ import "./globals.css";
 import { NavBar } from "@/components/navbar";
 import { LoginMonitor } from "@/components/loginMonitor";
 import { theme } from "@/theme";
+import { DialogRoot } from "@/components/dialog/dialogRoot";
 
 const fredoka = Fredoka({
 	subsets: ["latin"],
@@ -28,6 +29,7 @@ export default function RootLayout({
 				<LoginMonitor />
 				<NavBar />
 				{children}
+				<DialogRoot />
       </body>
     </html>
   );
