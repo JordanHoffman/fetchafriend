@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="bg-green-50">
       <body
-        className={`${fredoka.className} ${theme.text} ${theme.border} antialiased container`}
+        className={`${fredoka.className} ${theme.text} ${theme.border} antialiased container pb-20`}
       >
 					{/* glitchy HeadlessUI popover needs all content wrapped in div to allow outside clicking to work */}
 					<div>
