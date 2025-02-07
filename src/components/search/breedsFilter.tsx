@@ -4,6 +4,7 @@ import { theme } from "@/theme"
 import { Checkbox, Popover, PopoverButton, PopoverPanel } from "@headlessui/react"
 
 export const BreedsFilter = () => {
+	const resetFavorites = useStoreState(s => s.resetFavorites)
 	const { breeds } = useGetBreeds()
 
 	const filterBreeds = useStoreState(s => s.filterBreeds)
@@ -24,7 +25,10 @@ export const BreedsFilter = () => {
 			</PopoverButton>
 			<PopoverPanel anchor="bottom start" className={`flex flex-col m-1 rounded-3xl ${theme.border} border-4`}>
 				<button
-					onClick={clearBreedFilter}
+					onClick={() => {
+						resetFavorites()
+						clearBreedFilter()
+					}}
 					className={`${theme.bgDark} text-white pb-1 text-lg font-medium`}
 				>
 					Clear
@@ -34,7 +38,10 @@ export const BreedsFilter = () => {
 					return (
 						<Checkbox
 							checked={shouldFilter}
-							onChange={checked => editBreed(breed, checked)}
+							onChange={checked => {
+								resetFavorites()
+								editBreed(breed, checked)
+							}}
 							className={`flex justify-between items-center gap-3 px-2 py-2 ${theme.border} border-b-1 bg-lime-50`}
 							key={breed}
 						>

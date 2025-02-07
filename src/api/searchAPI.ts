@@ -176,7 +176,7 @@ export function useLocationSearch(bounds?: Bounds) {
 		bounds ? [ROUTE.POST.LOCATIONS_SEARCH, boundsCacheKey]: null,
 		([url]) => poster(url, {arg: {geoBoundingBox: {...bounds}}}),
 		{ 
-			onErrorRetry: async (error: FetchReponse<null>, key, config, revalidate, { retryCount }) => {
+			onErrorRetry: async (error: FetchReponse<null>) => {
 				console.error(`error useLocationSearch: ${error}`)
 				return
 			}
@@ -209,7 +209,7 @@ export function usePlaceSearch(city?: string) {
 		city ? [ROUTE.POST.LOCATIONS_SEARCH, city]: null,
 		([url]) => poster(url, {arg: { city }}),
 		{ 
-			onErrorRetry: async (error: FetchReponse<null>, key, config, revalidate, { retryCount }) => {
+			onErrorRetry: async (error: FetchReponse<null>) => {
 				console.error(`error useLocationSearch: ${error}`)
 				return
 			}

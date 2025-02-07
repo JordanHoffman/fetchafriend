@@ -3,6 +3,7 @@ import { theme } from "@/theme"
 import { Slider, SliderValueChangeDetails } from "@ark-ui/react"
 
 export const AgeFilter = () => {
+	const resetFavorites = useStoreState(s => s.resetFavorites)
 	const minAge = useStoreState(s => s.minAge)
 	const setMinAge = useStoreState(s => s.setMinAge)
 	const maxAge = useStoreState(s => s.maxAge)
@@ -38,12 +39,14 @@ export const AgeFilter = () => {
 				</div>
 				<button 
 					className={`rounded-full w-[75px] border-2 text-lg font-medium ${theme.bgDark} text-white`}
-					onClick={() => startSearchQuery()}
+					onClick={() => {
+						resetFavorites()
+						startSearchQuery()
+					}}
 				>
 					Go!
 				</button>
 			</div>
-
 
       <Slider.Control
 				className="flex items-center"
@@ -64,7 +67,6 @@ export const AgeFilter = () => {
 					className={`w-[20px] h-[20px] rounded-full relative ${theme.bgDark}`}
 					index={1}
 				>
-					{/* <div className={`w-[12px] h-[12px] rounded-full absolute inset-1/2 -translate-x-1/2 -translate-y-1/2 bg-amber-100`} /> */}
           <Slider.HiddenInput />
         </Slider.Thumb>
       </Slider.Control>

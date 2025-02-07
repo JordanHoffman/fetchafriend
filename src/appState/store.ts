@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { subscribeWithSelector } from "zustand/middleware";
 import { shallow } from "zustand/shallow";
-import { BASE_CURSOR } from "@/api/searchAPI";
+import { BASE_CURSOR, Bounds } from "@/api/searchAPI";
 import { type ReactNode } from "react";
 
 export type SortTypes = "breed:asc" | "breed:desc" | "name:asc" | "name:desc" | "age:asc" | "age:desc"
@@ -26,8 +26,15 @@ type StoreState = {
 	totalResults: number
 	setTotalResults: (newVal: number) => void
 
-	//Filtering - zip codes
-	desiredZips: string[]
+	//Filtering - Location
+	currentZip: string | undefined,
+	setCurrentZip: (newVal: string | undefined) => void
+	currentZipBounds: Bounds | undefined,
+	setCurrentZipBounds: (newVal: Bounds | undefined) => void,
+	currentCity: string | undefined,
+	setCurrentCity: (newVal: string | undefined) => void,
+	//these ultimately get put in the query, an empty array means search all locations
+	desiredZips: string[] 
 	setDesiredZips: (newVal: string[]) => void
 	//Filtering - breeds
 	filterBreeds: Record<string, boolean> | undefined
@@ -94,7 +101,13 @@ export const useStoreState = create<StoreState>()(
 				totalResults: 0,
 				setTotalResults: newVal => set(() => ({ totalResults: newVal })),
 
-				//Filter - zip codes
+				//Filter - Location
+				currentZip: undefined as string | undefined,
+				setCurrentZip: newVal => set(() => ({ currentZip: newVal })),
+				currentZipBounds: undefined as Bounds | undefined,
+				setCurrentZipBounds: newVal => set(() => ({ currentZipBounds: newVal })),
+				currentCity: undefined as string | undefined,
+				setCurrentCity: newVal => set(() => ({ currentCity: newVal })),
 				desiredZips: [] as string[],
 				setDesiredZips: newVal => set(() => ({ desiredZips: newVal })),
 				//Filter - breeds
