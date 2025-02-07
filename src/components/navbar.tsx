@@ -9,7 +9,7 @@ export const NavBar = () => {
 	const router = useRouter()
 	const { triggerLogout } = useLogout()
 	const handleLogin = () => {
-		router.push('/login')
+		router.push('/')
 	}
 
 	const handleLogout = () => {

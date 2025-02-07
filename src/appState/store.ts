@@ -24,7 +24,9 @@ type StoreState = {
 	/** trigger a search based off all user's current options, starting from page 1 if page is not provided */
 	startSearchQuery: (page?: number) => void
 	totalResults: number
-	setTotalResults: (newVal: number) => void
+	setTotalResults: (newVal: number) => void,
+	currentPage: number,
+	setCurrentPage: (newVal: number) => void,
 
 	//Filtering - Location
 	currentZip: string | undefined,
@@ -92,14 +94,16 @@ export const useStoreState = create<StoreState>()(
 						const minAgeQuery = state.minAge === MIN_AGE ? '' : `ageMin=${state.minAge}`
 						const maxAgeQuery = state.maxAge === MAX_AGE ? '' : `ageMax=${state.maxAge}`
 						const cursor = page ? `size=25&from=${(page - 1) * 25}` : BASE_CURSOR
-
 						const query = addQueryParts([zipQuery, breedsQuery, minAgeQuery, maxAgeQuery, state.sortByQuery, cursor])
 						//actual trigger happens now:
 						state.currentSearchQuery = query
+						state.currentPage = page || 1
 					})
 				},
 				totalResults: 0,
 				setTotalResults: newVal => set(() => ({ totalResults: newVal })),
+				currentPage: 1,
+				setCurrentPage: newVal => set(() => ({ currentPage: newVal })),
 
 				//Filter - Location
 				currentZip: undefined as string | undefined,

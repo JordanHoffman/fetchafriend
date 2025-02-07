@@ -50,7 +50,7 @@ export const CityZipSearch = ({ className = "" }: {className?: string}) => {
 			}
 			if (placeSearchResult) {
 				if (!placeSearchResult.results.length) {
-					alert('No locations found for this city or zip. Searching all locations')
+					alert('We could not recognize this city. Searching all locations')
 					setDesiredZipsAndSearch()
 					triggerSearch.current = false
 					return
@@ -79,8 +79,8 @@ export const CityZipSearch = ({ className = "" }: {className?: string}) => {
 			}
 
 			if (locationResult) {
-				if (!locationResult.length) {
-					alert('No location matched your zip code, searching all locations.')
+				if (!locationResult.length || locationResult[0] === null) {
+					alert('We could not recognize this ZIP code. Searching all locations')
 					setDesiredZipsAndSearch()
 					triggerSearch.current = false
 					return
@@ -127,13 +127,17 @@ export const CityZipSearch = ({ className = "" }: {className?: string}) => {
 		formState: { errors },
 	} = useForm<Inputs>({ 
 		mode: "onSubmit",
-		reValidateMode: "onSubmit"
+		reValidateMode: "onSubmit",
+		defaultValues: {
+			cityOrZip: "",
+		}
 	})
 
 	const inputValue = watch("cityOrZip")
 
 	//if user edits input but searches through a filter or some other way than main search button, we still need to keep track of this input, so monitor and update accordingly.
 	useEffect(() => {
+		console.log('input change')
 		setHasChanges(true)
 	}, [inputValue])
 

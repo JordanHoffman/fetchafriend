@@ -26,11 +26,14 @@ export default function RootLayout({
       <body
         className={`${fredoka.className} ${theme.text} ${theme.border} antialiased container`}
       >
-				<LoginMonitor />
-				<NavBar />
-				{children}
-				<DialogRoot />
-      </body>
+					{/* glitchy HeadlessUI popover needs all content wrapped in div to allow outside clicking to work */}
+					<div>
+						<LoginMonitor />
+						<NavBar />
+						{children}
+						<DialogRoot />
+					</div>
+				</body>
     </html>
   );
 }

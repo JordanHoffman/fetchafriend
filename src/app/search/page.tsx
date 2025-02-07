@@ -1,8 +1,7 @@
-import { Search } from "@/components/search/search"
+import { SearchPage } from "@/components/search/searchPage"
 
-export default function SearchPage() {
-
+export default function Search() {
 	return (
-		<Search />
+		<SearchPage />
 	)
 }

@@ -9,7 +9,7 @@ import { SortTool } from "./sortTool"
 import { CityZipSearch } from "./zipCitySearch"
 import { theme } from "@/theme"
 
-export const Search = () => {
+export const SearchPage = () => {
 	/* whenever currentQuery updates, it causes a chain reaction which  
 		1) triggers Get /dogs/search to get the id results 
 		2) triggers POST /dogs with those id results in order to get final dog object list. 
@@ -44,11 +44,9 @@ export const Search = () => {
 
 	return (
 		<>
-			<div className={`border-8 rounded-4xl my-3 my:md-10 px-4 lg:px-8 py-3 sm:py-10 ${theme.bg}`}>
+			<div className={`relative border-8 rounded-4xl my-3 my:md-10 px-4 lg:px-8 py-3 sm:py-10 ${theme.bg}`}>
 				<div className="flex flex-col lg:flex-row gap-3 lg:gap-10 xl:gap-15 mb-4">
-					{/* <ZipSearch /> */}
 					<CityZipSearch />
-					
 					<FilterTool className="xl:min-w-[450px]"/>
 					<SortTool className="max-w-[400px] md:max-w-full lg:max-w-[350px]"/>
 				</div>

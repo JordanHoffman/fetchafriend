@@ -88,4 +88,3 @@ export const ROUTE = {
 		LOCATIONS_SEARCH: makeRoute('/locations/search')
 	}
 }
-

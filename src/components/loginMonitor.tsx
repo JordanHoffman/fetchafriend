@@ -15,7 +15,7 @@ export const LoginMonitor = () => {
 		if (error && error.status === 401) {
 			setIsLoggedIn(false)
 			if (window.location.pathname.includes('/search')) {
-				router.replace('/login?expired=true')
+				router.replace('/?expired=true')
 			}
 		}
 		else if (breeds?.result?.length) {
@@ -25,7 +25,7 @@ export const LoginMonitor = () => {
 
 	useEffect(() => {
 		if (isLoggedIn === false && window.location.pathname.includes('/search')) {
-			router.replace('/login')
+			router.replace('/')
 		}
 	}, [isLoggedIn, router])
 

@@ -4,7 +4,6 @@ import { poster, ROUTE } from "./apiBase"
 import { useRouter } from "next/navigation"
 import { mutate } from "swr"
 
-
 type LoginBody = {
 	name: string,
 	email: string

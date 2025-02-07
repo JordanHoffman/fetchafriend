@@ -1,4 +1,4 @@
-import { AgeFilter } from './filtering/ageFilter'
+import { AgeFilter } from './ageFilter'
 import { BreedsFilter } from './breedsFilter'
 
 export const FilterTool = ({ className = "" }: {className?: string}) => {

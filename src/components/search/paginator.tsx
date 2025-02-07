@@ -1,7 +1,6 @@
 import { useStoreState } from '@/appState/store'
 import { theme } from '@/theme'
 import { Pagination } from '@ark-ui/react/pagination'
-import { useState } from 'react'
 
 export const Paginator = ({
 	className="",
@@ -10,7 +9,8 @@ export const Paginator = ({
 }) => {
 	const startSearchQuery = useStoreState(s => s.startSearchQuery)
 	const totalResults = useStoreState(s => s.totalResults)
-	const [currentPage, setCurrentPage] = useState(1)
+	const currentPage = useStoreState(s => s.currentPage)
+	const setCurrentPage = useStoreState(s => s.setCurrentPage)
 
 	if (!totalResults) return null
 
